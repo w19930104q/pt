@@ -131,10 +131,16 @@ func LoadMTL(path string, parent Material, materials map[string]*Material) error
 			material.Color = Color{c[0], c[1], c[2]}
 		case "map_Kd":
 			p := RelativePath(path, args[0])
-			material.Texture = GetTexture(p)
+			// A missing texture leaves the material's color in place instead
+			// of crashing the whole scene load.
+			if texture := GetTexture(p); texture != nil {
+				material.Texture = texture
+			}
 		case "map_bump":
 			p := RelativePath(path, args[0])
-			material.NormalTexture = GetTexture(p).Pow(1 / 2.2)
+			if texture := GetTexture(p); texture != nil {
+				material.NormalTexture = texture.Pow(1 / 2.2)
+			}
 		}
 	}
 	return scanner.Err()

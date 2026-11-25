@@ -82,6 +82,13 @@ func (t *Triangle) MaterialAt(p Vector) Material {
 	return *t.Material
 }
 
+// SetMaterial gives the triangle its own copy of the material. The pointer is
+// swapped rather than mutating the previously shared material, so triangles
+// belonging to other objects keep their old material.
+func (t *Triangle) SetMaterial(material Material) {
+	t.Material = material.Clone()
+}
+
 func (t *Triangle) NormalAt(p Vector) Vector {
 	u, v, w := t.Barycentric(p)
 	n := Vector{}

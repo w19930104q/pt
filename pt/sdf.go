@@ -67,6 +67,12 @@ func (s *SDFShape) MaterialAt(p Vector) Material {
 	return s.Material
 }
 
+// SetMaterial replaces the SDF shape's material in place. Shapes created from
+// value materials do not share storage, so this cannot affect other shapes.
+func (s *SDFShape) SetMaterial(material Material) {
+	s.Material = material
+}
+
 // SDF
 
 type SDF interface {

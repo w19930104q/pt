@@ -47,6 +47,12 @@ func (f *Function) MaterialAt(p Vector) Material {
 	return f.Material
 }
 
+// SetMaterial replaces the function shape's material in place. Shapes created
+// from value materials do not share storage, so this cannot affect other shapes.
+func (f *Function) SetMaterial(material Material) {
+	f.Material = material
+}
+
 func (f *Function) NormalAt(p Vector) Vector {
 	eps := 1e-3
 	v := Vector{

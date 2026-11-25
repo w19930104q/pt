@@ -42,6 +42,12 @@ func (c *Cube) MaterialAt(p Vector) Material {
 	return c.Material
 }
 
+// SetMaterial replaces the cube's material in place. Shapes created from value
+// materials do not share storage, so this cannot affect other shapes.
+func (c *Cube) SetMaterial(material Material) {
+	c.Material = material
+}
+
 func (c *Cube) NormalAt(p Vector) Vector {
 	switch {
 	case p.X < c.Min.X+EPS:

@@ -71,6 +71,12 @@ func (c *Cylinder) MaterialAt(p Vector) Material {
 	return c.Material
 }
 
+// SetMaterial replaces the cylinder's material in place. Shapes created from
+// value materials do not share storage, so this cannot affect other shapes.
+func (c *Cylinder) SetMaterial(material Material) {
+	c.Material = material
+}
+
 func (c *Cylinder) NormalAt(p Vector) Vector {
 	p.Z = 0
 	return p.Normalize()

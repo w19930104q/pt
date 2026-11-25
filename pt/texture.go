@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"math"
+	"sync"
 )
 
 type Texture interface {
@@ -14,21 +15,39 @@ type Texture interface {
 	MulScalar(a float64) Texture
 }
 
-var textures map[string]Texture
+var (
+	textures     = make(map[string]Texture)
+	texturesLock sync.Mutex
+)
 
 func init() {
 	textures = make(map[string]Texture)
 }
 
+// GetTexture returns the cached texture at path, loading it on first use. A
+// failed load is never cached and returns nil without panicking, leaving every
+// material that uses the path unchanged. The cache is safe for concurrent use
+// while a render batch is in flight.
 func GetTexture(path string) Texture {
-	if texture, ok := textures[path]; ok {
+	texturesLock.Lock()
+	texture, ok := textures[path]
+	texturesLock.Unlock()
+	if ok {
 		return texture
 	}
-	if texture, err := LoadTexture(path); err == nil {
+	texture, err := LoadTexture(path)
+	if err != nil {
+		return nil
+	}
+	texturesLock.Lock()
+	// Another goroutine may have loaded the same path while we were loading.
+	if existing, ok := textures[path]; ok {
+		texture = existing
+	} else {
 		textures[path] = texture
-		return texture
 	}
-	return nil
+	texturesLock.Unlock()
+	return texture
 }
 
 func LoadTexture(path string) (Texture, error) {

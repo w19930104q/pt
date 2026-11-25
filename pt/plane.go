@@ -41,6 +41,12 @@ func (p *Plane) MaterialAt(a Vector) Material {
 	return p.Material
 }
 
+// SetMaterial replaces the plane's material in place. Shapes created from value
+// materials do not share storage, so this cannot affect other shapes.
+func (p *Plane) SetMaterial(material Material) {
+	p.Material = material
+}
+
 func (p *Plane) NormalAt(a Vector) Vector {
 	return p.Normal
 }

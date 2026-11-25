@@ -144,9 +144,20 @@ func (m *Mesh) Transform(matrix Matrix) {
 	m.dirty()
 }
 
+// SetMaterial replaces the material of every triangle in the mesh with an
+// independent copy. Triangles of any other mesh keep referencing their old
+// material: the shared *Material is never mutated, only the triangle pointers
+// are swapped.
 func (m *Mesh) SetMaterial(material Material) {
+	m.ReplaceMaterial(material.Clone())
+}
+
+// ReplaceMaterial points every triangle in the mesh at the given material.
+// It is a pure reference swap, so the previously shared material stays intact
+// for any shape still using it and for any render batch already in flight.
+func (m *Mesh) ReplaceMaterial(material *Material) {
 	for _, t := range m.Triangles {
-		t.Material = &material
+		t.Material = material
 	}
 }
 

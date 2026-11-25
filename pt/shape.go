@@ -9,6 +9,14 @@ type Shape interface {
 	MaterialAt(Vector) Material
 }
 
+// MaterialHolder is implemented by shapes whose material can be replaced
+// without affecting other shapes, even when they currently share the same
+// material. Replacement swaps the material reference instead of mutating the
+// previously shared material in place.
+type MaterialHolder interface {
+	SetMaterial(material Material)
+}
+
 type TransformedShape struct {
 	Shape
 	Matrix  Matrix
@@ -21,6 +29,14 @@ func NewTransformedShape(s Shape, m Matrix) Shape {
 
 func (s *TransformedShape) BoundingBox() Box {
 	return s.Matrix.MulBox(s.Shape.BoundingBox())
+}
+
+// SetMaterial forwards the replacement to the wrapped shape, keeping material
+// replacement independent of the transform wrapper.
+func (s *TransformedShape) SetMaterial(material Material) {
+	if holder, ok := s.Shape.(MaterialHolder); ok {
+		holder.SetMaterial(material)
+	}
 }
 
 func (s *TransformedShape) Intersect(r Ray) Hit {

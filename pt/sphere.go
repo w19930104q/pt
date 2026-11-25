@@ -55,6 +55,12 @@ func (s *Sphere) MaterialAt(p Vector) Material {
 	return s.Material
 }
 
+// SetMaterial replaces the sphere's material in place. Shapes created from
+// value materials do not share storage, so this cannot affect other shapes.
+func (s *Sphere) SetMaterial(material Material) {
+	s.Material = material
+}
+
 func (s *Sphere) NormalAt(p Vector) Vector {
 	return p.Sub(s.Center).Normalize()
 }
