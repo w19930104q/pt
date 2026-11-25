@@ -128,6 +128,15 @@ func (t *Triangle) NormalAt(p Vector) Vector {
 	return n
 }
 
+// Degenerate reports whether the triangle has (near) zero area, i.e. its
+// vertices are collinear or coincident. Degenerate triangles cannot be hit
+// by rays and are explicitly excluded from acceleration structures.
+func (t *Triangle) Degenerate() bool {
+	e1 := t.V2.Sub(t.V1)
+	e2 := t.V3.Sub(t.V1)
+	return e1.Cross(e2).Length() < EPS
+}
+
 func (t *Triangle) Area() float64 {
 	e1 := t.V2.Sub(t.V1)
 	e2 := t.V3.Sub(t.V1)

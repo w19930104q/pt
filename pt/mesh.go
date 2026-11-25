@@ -28,12 +28,31 @@ func (m *Mesh) Copy() *Mesh {
 
 func (m *Mesh) Compile() {
 	if m.tree == nil {
-		shapes := make([]Shape, len(m.Triangles))
-		for i, triangle := range m.Triangles {
-			shapes[i] = triangle
+		// Degenerate (zero-area) triangles can never be hit; exclude them
+		// explicitly so they don't inflate the k-d tree bounds.
+		shapes := make([]Shape, 0, len(m.Triangles))
+		for _, triangle := range m.Triangles {
+			if triangle.Degenerate() {
+				continue
+			}
+			shapes = append(shapes, triangle)
 		}
 		m.tree = NewTree(shapes)
 	}
+}
+
+// UpdateTriangles notifies the mesh that the triangles at the given indices
+// had their vertices (or the triangles themselves) modified. The k-d tree is
+// invalidated and lazily rebuilt on the next Compile or Intersect, so
+// intersection results are identical to a full rebuild. The Triangles slice
+// is left untouched: unmodified triangles keep their original indices.
+func (m *Mesh) UpdateTriangles(indices ...int) {
+	for _, i := range indices {
+		if i < 0 || i >= len(m.Triangles) {
+			panic("pt: UpdateTriangles index out of range")
+		}
+	}
+	m.dirty()
 }
 
 func (a *Mesh) Add(b *Mesh) {
@@ -55,6 +74,7 @@ func (m *Mesh) BoundingBox() Box {
 }
 
 func (m *Mesh) Intersect(r Ray) Hit {
+	m.Compile() // no-op unless the tree was invalidated
 	return m.tree.Intersect(r)
 }
 
