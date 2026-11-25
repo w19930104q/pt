@@ -27,6 +27,9 @@ func (m *Mesh) Copy() *Mesh {
 }
 
 func (m *Mesh) Compile() {
+	if m.box == nil {
+		m.computeBox()
+	}
 	if m.tree == nil {
 		shapes := make([]Shape, len(m.Triangles))
 		for i, triangle := range m.Triangles {
@@ -41,15 +44,19 @@ func (a *Mesh) Add(b *Mesh) {
 	a.dirty()
 }
 
+func (m *Mesh) computeBox() {
+	min := m.Triangles[0].V1
+	max := m.Triangles[0].V1
+	for _, t := range m.Triangles {
+		min = min.Min(t.V1).Min(t.V2).Min(t.V3)
+		max = max.Max(t.V1).Max(t.V2).Max(t.V3)
+	}
+	m.box = &Box{min, max}
+}
+
 func (m *Mesh) BoundingBox() Box {
 	if m.box == nil {
-		min := m.Triangles[0].V1
-		max := m.Triangles[0].V1
-		for _, t := range m.Triangles {
-			min = min.Min(t.V1).Min(t.V2).Min(t.V3)
-			max = max.Max(t.V1).Max(t.V2).Max(t.V3)
-		}
-		m.box = &Box{min, max}
+		m.computeBox()
 	}
 	return *m.box
 }
