@@ -29,8 +29,8 @@ func (c *Camera) SetFocus(focalPoint Vector, apertureRadius float64) {
 
 func (c *Camera) CastRay(x, y, w, h int, u, v float64, rnd *rand.Rand) Ray {
 	aspect := float64(w) / float64(h)
-	px := ((float64(x)+u-0.5)/(float64(w)-1))*2 - 1
-	py := ((float64(y)+v-0.5)/(float64(h)-1))*2 - 1
+	px := ((float64(x)+u)/float64(w))*2 - 1
+	py := ((float64(y)+v)/float64(h))*2 - 1
 	d := Vector{}
 	d = d.Add(c.u.MulScalar(-px * aspect))
 	d = d.Add(c.v.MulScalar(-py))

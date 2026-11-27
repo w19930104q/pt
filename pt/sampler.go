@@ -135,7 +135,7 @@ func (s *DefaultSampler) sampleLights(scene *Scene, n Ray, rnd *rand.Rand) Color
 		return result
 	} else {
 		// pick a random light
-		light := scene.Lights[rand.Intn(nLights)]
+		light := scene.Lights[rnd.Intn(nLights)]
 		return s.sampleLight(scene, n, rnd, light).MulScalar(float64(nLights))
 	}
 }

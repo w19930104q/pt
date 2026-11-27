@@ -25,6 +25,8 @@ type Renderer struct {
 	FireflyThreshold   float64
 	NumCPU             int
 	Verbose            bool
+	Seed               int64
+	frame              int
 }
 
 func NewRenderer(scene *Scene, camera *Camera, sampler Sampler, w, h int) *Renderer {
@@ -54,6 +56,9 @@ func (r *Renderer) run() {
 	spp := r.SamplesPerPixel
 	sppRoot := int(math.Sqrt(float64(r.SamplesPerPixel)))
 	ncpu := r.NumCPU
+	seed := r.Seed
+	frame := r.frame
+	r.frame++
 
 	runtime.GOMAXPROCS(ncpu)
 	scene.Compile()
@@ -63,9 +68,9 @@ func (r *Renderer) run() {
 	scene.rays = 0
 	for i := 0; i < ncpu; i++ {
 		go func(i int) {
-			rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 			for y := i; y < h; y += ncpu {
 				for x := 0; x < w; x++ {
+					rnd := rand.New(rand.NewSource(pixelSeed(seed, frame, x, y)))
 					if r.StratifiedSampling {
 						// stratified subsampling
 						for u := 0; u < sppRoot; u++ {
@@ -124,6 +129,19 @@ func (r *Renderer) run() {
 		r.showProgress(start, scene.RayCount(), i+1, h)
 	}
 	r.printf("\n")
+}
+
+func pixelSeed(seed int64, frame, x, y int) int64 {
+	z := uint64(seed) + 0x9E3779B97F4A7C15
+	z ^= uint64(frame+1) * 0xBF58476D1CE4E5B9
+	z ^= uint64(x+1) * 0x94D049BB133111EB
+	z ^= uint64(y+1) * 0x2545F4914F6CDD1D
+	z ^= z >> 30
+	z *= 0xBF58476D1CE4E5B9
+	z ^= z >> 27
+	z *= 0x94D049BB133111EB
+	z ^= z >> 31
+	return int64(z)
 }
 
 func (r *Renderer) printf(format string, a ...interface{}) {
