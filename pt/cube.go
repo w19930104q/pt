@@ -14,6 +14,11 @@ func NewCube(min, max Vector, material Material) *Cube {
 	return &Cube{min, max, material, box}
 }
 
+func (c *Cube) CopyShape() Shape {
+	cc := *c
+	return &cc
+}
+
 func (c *Cube) Compile() {
 }
 

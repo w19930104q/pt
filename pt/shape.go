@@ -7,6 +7,7 @@ type Shape interface {
 	UV(Vector) Vector
 	NormalAt(Vector) Vector
 	MaterialAt(Vector) Material
+	CopyShape() Shape
 }
 
 type TransformedShape struct {
@@ -21,6 +22,10 @@ func NewTransformedShape(s Shape, m Matrix) Shape {
 
 func (s *TransformedShape) BoundingBox() Box {
 	return s.Matrix.MulBox(s.Shape.BoundingBox())
+}
+
+func (s *TransformedShape) CopyShape() Shape {
+	return &TransformedShape{s.Shape.CopyShape(), s.Matrix, s.Inverse}
 }
 
 func (s *TransformedShape) Intersect(r Ray) Hit {

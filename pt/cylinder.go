@@ -26,6 +26,11 @@ func NewTransformedCylinder(v0, v1 Vector, radius float64, material Material) Sh
 	return NewTransformedShape(c, m)
 }
 
+func (c *Cylinder) CopyShape() Shape {
+	cc := *c
+	return &cc
+}
+
 func (c *Cylinder) Compile() {
 }
 

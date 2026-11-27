@@ -76,6 +76,15 @@ func (v *Volume) Sample(x, y, z float64) float64 {
 	return c
 }
 
+func (v *Volume) CopyShape() Shape {
+	vv := *v
+	vv.Data = make([]float64, len(v.Data))
+	copy(vv.Data, v.Data)
+	vv.Windows = make([]VolumeWindow, len(v.Windows))
+	copy(vv.Windows, v.Windows)
+	return &vv
+}
+
 func (v *Volume) Compile() {
 }
 

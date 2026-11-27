@@ -18,6 +18,12 @@ func NewSphericalHarmonic(l, m int, pm, nm Material) Shape {
 	return sh
 }
 
+func (s *SphericalHarmonic) CopyShape() Shape {
+	ss := *s
+	ss.mesh = s.mesh.CopyShape().(*Mesh)
+	return &ss
+}
+
 func (s *SphericalHarmonic) Compile() {
 	s.mesh.Compile()
 }

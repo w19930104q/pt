@@ -16,6 +16,11 @@ func NewSphere(center Vector, radius float64, material Material) Shape {
 	return &Sphere{center, radius, material, box}
 }
 
+func (s *Sphere) CopyShape() Shape {
+	ss := *s
+	return &ss
+}
+
 func (s *Sphere) Compile() {
 }
 

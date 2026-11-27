@@ -12,6 +12,22 @@ type Scene struct {
 	rays         uint64
 }
 
+func (s *Scene) Copy() *Scene {
+	c := &Scene{}
+	c.Color = s.Color
+	c.Texture = s.Texture
+	c.TextureAngle = s.TextureAngle
+	c.Shapes = make([]Shape, len(s.Shapes))
+	for i, shape := range s.Shapes {
+		c.Shapes[i] = shape.CopyShape()
+	}
+	c.Lights = make([]Shape, len(s.Lights))
+	for i, light := range s.Lights {
+		c.Lights[i] = light.CopyShape()
+	}
+	return c
+}
+
 func (s *Scene) Compile() {
 	for _, shape := range s.Shapes {
 		shape.Compile()

@@ -12,6 +12,11 @@ func NewFunction(function Func, box Box, material Material) Shape {
 	return &Function{function, box, material}
 }
 
+func (f *Function) CopyShape() Shape {
+	ff := *f
+	return &ff
+}
+
 func (f *Function) Compile() {
 }
 

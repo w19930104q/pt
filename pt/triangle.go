@@ -20,6 +20,16 @@ func NewTriangle(v1, v2, v3, t1, t2, t3 Vector, material Material) *Triangle {
 	return &t
 }
 
+func (t *Triangle) Copy() *Triangle {
+	c := *t
+	c.Material = CopyMaterialPtr(t.Material)
+	return &c
+}
+
+func (t *Triangle) CopyShape() Shape {
+	return t.Copy()
+}
+
 func (t *Triangle) Vertices() (Vector, Vector, Vector) {
 	return t.V1, t.V2, t.V3
 }

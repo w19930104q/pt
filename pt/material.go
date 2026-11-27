@@ -15,6 +15,19 @@ type Material struct {
 	Transparent    bool
 }
 
+func (m Material) Copy() Material {
+	c := m
+	return c
+}
+
+func CopyMaterialPtr(m *Material) *Material {
+	if m == nil {
+		return nil
+	}
+	cp := m.Copy()
+	return &cp
+}
+
 func DiffuseMaterial(color Color) Material {
 	return Material{color, nil, nil, nil, nil, 1, 0, 1, 0, 0, -1, false}
 }

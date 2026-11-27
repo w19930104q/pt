@@ -13,6 +13,11 @@ func NewPlane(point, normal Vector, material Material) *Plane {
 	return &Plane{point, normal, material}
 }
 
+func (p *Plane) CopyShape() Shape {
+	pp := *p
+	return &pp
+}
+
 func (p *Plane) Compile() {
 }
 

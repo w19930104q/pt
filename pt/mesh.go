@@ -17,11 +17,10 @@ func (m *Mesh) dirty() {
 	m.tree = nil
 }
 
-func (m *Mesh) Copy() *Mesh {
+func (m *Mesh) CopyShape() Shape {
 	triangles := make([]*Triangle, len(m.Triangles))
 	for i, t := range m.Triangles {
-		a := *t
-		triangles[i] = &a
+		triangles[i] = t.Copy()
 	}
 	return NewMesh(triangles)
 }

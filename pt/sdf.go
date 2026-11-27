@@ -13,6 +13,11 @@ func NewSDFShape(sdf SDF, material Material) Shape {
 	return &SDFShape{sdf, material}
 }
 
+func (s *SDFShape) CopyShape() Shape {
+	ss := *s
+	return &ss
+}
+
 func (s *SDFShape) Compile() {
 }
 
