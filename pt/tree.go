@@ -28,6 +28,14 @@ func (tree *Tree) Intersect(r Ray) Hit {
 	return tree.Root.Intersect(r, tmin, tmax)
 }
 
+func (tree *Tree) IntersectAll(r Ray) Hits {
+	tmin, tmax := tree.Box.Intersect(r)
+	if tmax < tmin || tmax <= 0 {
+		return nil
+	}
+	return tree.Root.IntersectAll(r, tmin, tmax)
+}
+
 type Node struct {
 	Axis   Axis
 	Point  float64
@@ -82,6 +90,48 @@ func (node *Node) Intersect(r Ray, tmin, tmax float64) Hit {
 	}
 }
 
+func (node *Node) IntersectAll(r Ray, tmin, tmax float64) Hits {
+	switch node.Axis {
+	case AxisNone:
+		return node.IntersectShapesAll(r)
+	case AxisX:
+		tsplit := (node.Point - r.Origin.X) / r.Direction.X
+		leftFirst := (r.Origin.X < node.Point) || (r.Origin.X == node.Point && r.Direction.X <= 0)
+		return node.intersectAllSplit(r, tmin, tmax, tsplit, leftFirst)
+	case AxisY:
+		tsplit := (node.Point - r.Origin.Y) / r.Direction.Y
+		leftFirst := (r.Origin.Y < node.Point) || (r.Origin.Y == node.Point && r.Direction.Y <= 0)
+		return node.intersectAllSplit(r, tmin, tmax, tsplit, leftFirst)
+	case AxisZ:
+		tsplit := (node.Point - r.Origin.Z) / r.Direction.Z
+		leftFirst := (r.Origin.Z < node.Point) || (r.Origin.Z == node.Point && r.Direction.Z <= 0)
+		return node.intersectAllSplit(r, tmin, tmax, tsplit, leftFirst)
+	}
+	return nil
+}
+
+func (node *Node) intersectAllSplit(r Ray, tmin, tmax, tsplit float64, leftFirst bool) Hits {
+	var first, second *Node
+	if leftFirst {
+		first = node.Left
+		second = node.Right
+	} else {
+		first = node.Right
+		second = node.Left
+	}
+	if tsplit > tmax || tsplit <= 0 {
+		return first.IntersectAll(r, tmin, tmax)
+	} else if tsplit < tmin {
+		return second.IntersectAll(r, tmin, tmax)
+	} else {
+		h1 := first.IntersectAll(r, tmin, tsplit)
+		h2 := second.IntersectAll(r, tsplit, tmax)
+		result := append(h1, h2...)
+		result.Sort()
+		return result
+	}
+}
+
 func (node *Node) IntersectShapes(r Ray) Hit {
 	hit := NoHit
 	for _, shape := range node.Shapes {
@@ -91,6 +141,18 @@ func (node *Node) IntersectShapes(r Ray) Hit {
 		}
 	}
 	return hit
+}
+
+func (node *Node) IntersectShapesAll(r Ray) Hits {
+	var hits Hits
+	for _, shape := range node.Shapes {
+		h := shape.Intersect(r)
+		if h.Ok() {
+			hits = append(hits, h)
+		}
+	}
+	hits.Sort()
+	return hits
 }
 
 func (node *Node) PartitionScore(axis Axis, point float64) int {

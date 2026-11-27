@@ -36,3 +36,8 @@ func (s *Scene) Intersect(r Ray) Hit {
 	atomic.AddUint64(&s.rays, 1)
 	return s.tree.Intersect(r)
 }
+
+func (s *Scene) IntersectAll(r Ray) Hits {
+	atomic.AddUint64(&s.rays, 1)
+	return s.tree.IntersectAll(r)
+}

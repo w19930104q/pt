@@ -57,7 +57,9 @@ func (s *DefaultSampler) sample(scene *Scene, ray Ray, emission bool, samples, d
 	if depth > s.MaxBounces {
 		return Black
 	}
-	hit := scene.Intersect(ray)
+	hits := scene.IntersectAll(ray)
+	hits.Sort()
+	hit := hits.Closest()
 	if !hit.Ok() {
 		return s.sampleEnvironment(scene, ray)
 	}
@@ -183,8 +185,10 @@ func (s *DefaultSampler) sampleLight(scene *Scene, n Ray, rnd *rand.Rand, light 
 		return Black
 	}
 
-	// check for light visibility
-	hit := scene.Intersect(ray)
+	// check for light visibility, skipping transparent objects
+	hits := scene.IntersectAll(ray)
+	hits.Sort()
+	hit := hits.FirstOpaque(ray)
 	if !hit.Ok() || hit.Shape != light {
 		return Black
 	}
